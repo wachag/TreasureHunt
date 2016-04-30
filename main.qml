@@ -23,12 +23,13 @@ import "TreasureHunt.js" as TreasureHunt
                        id: gameCanvas
 
                        anchors.fill: parent
-                       source: "background.jpg"
+                       source: "assets/background.jpg"
                        fillMode: Image.PreserveAspectCrop
                    }
             MouseArea {
                            anchors.fill: parent
-                           onClicked: TreasureHunt.handleClick(mouse.x, mouse.y)
+                           onClicked: TreasureHunt.handleClick(mouse.x, mouse.y, mouse.button == Qt.RightButton )
+                           acceptedButtons: Qt.LeftButton | Qt.RightButton
                        }
         }
 

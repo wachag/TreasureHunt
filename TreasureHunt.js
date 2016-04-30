@@ -1,4 +1,4 @@
-var blockSize = 40;
+var blockSize = 64;
 var maxColumn = 10;
 var maxRow = 15;
 var maxIndex = maxColumn * maxRow;
@@ -82,12 +82,13 @@ function createBlock(column, row, value) {
 function showBlock(column, row){
     console.log(column+" "+row)
     if (column >= maxColumn || column < 0 || row >= maxRow || row < 0)
-        return;
+        return 0;
     if (board[index(column, row)] == null)
-        return;
-    if (board[index(column,row)].dataHidden==0)return;
+        return 0;
+    if (board[index(column,row)].dataHidden==0)return 0;
     console.log(board[index(column, row)].text);
     board[index(column,row)].dataHidden=0;
+    if (board[index(column,row)].text==-1)return -1;
     if (board[index(column,row)].text=="0"){
         for(var a=column-1;a<=column+1;a++)
             for(var b=row-1;b<=row+1;b++){
@@ -96,8 +97,18 @@ function showBlock(column, row){
     }
 }
 
-function handleClick(xPos, yPos) {
+function handleClick(xPos, yPos, rightPressed) {
     var column = Math.floor(xPos / blockSize);
     var row = Math.floor(yPos / blockSize);
-    showBlock(column,row);
+    console.log(rightPressed+" sss");
+    if(rightPressed){
+
+        if(board[index(column,row)].marked==0)
+            board[index(column,row)].marked=1;
+        else
+            board[index(column,row)].marked=0;
+        return;
+    }
+    if(showBlock(column,row)==-1)
+        console.log("DIE!");
 }
