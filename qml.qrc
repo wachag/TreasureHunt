@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>Block.qml</file>
+        <file>TreasureHunt.js</file>
+        <file>Button.qml</file>
+        <file>background.jpg</file>
+    </qresource>
+</RCC>
