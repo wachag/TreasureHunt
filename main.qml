@@ -2,12 +2,17 @@ import QtQuick 2.3
 import QtQuick.Window 2.2
 import "TreasureHunt.js" as TreasureHunt
 
+Window {
+    visible: true
+    width: 490
+    height: 720
 
     Rectangle {
+        visible: true
         id: screen
 
-        width: 490
-        height: 720
+        width: parent.width
+        height: parent.height
 
         SystemPalette {
             id: activePalette
@@ -20,17 +25,18 @@ import "TreasureHunt.js" as TreasureHunt
                 bottom: toolBar.top
             }
             Image {
-                       id: gameCanvas
+                id: gameCanvas
 
-                       anchors.fill: parent
-                       source: "assets/background.jpg"
-                       fillMode: Image.PreserveAspectCrop
-                   }
+                anchors.fill: parent
+                source: "assets/background.jpg"
+                fillMode: Image.PreserveAspectCrop
+            }
             MouseArea {
-                           anchors.fill: parent
-                           onClicked: TreasureHunt.handleClick(mouse.x, mouse.y, mouse.button == Qt.RightButton )
-                           acceptedButtons: Qt.LeftButton | Qt.RightButton
-                       }
+                anchors.fill: parent
+                onClicked: TreasureHunt.handleClick(
+                               mouse.x, mouse.y, mouse.button == Qt.RightButton)
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+            }
         }
 
         Rectangle {
@@ -59,3 +65,4 @@ import "TreasureHunt.js" as TreasureHunt
             }
         }
     }
+}

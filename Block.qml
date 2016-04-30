@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import "TreasureBlock.js" as TreasureBlock
 
 Rectangle {
     width: 128
@@ -8,17 +9,28 @@ Rectangle {
     property int dataHidden: 1
     property int marked: 0
     Image {
+        id: tile
         anchors.fill: parent
-        source: parent.marked?"assets/cave0131.png":(parent.dataHidden? "assets/cave0094.png":(parent.text==-1 ?"assets/cave0114.png": "assets/cave0145.png"))
+        source: TreasureBlock.getBlockTileName(parent)
         fillMode: Image.PreserveAspectCrop
+        z: 0
     }
+    Image{
+        id: doodad
+        anchors.fill: parent
+        fillMode: Image.PreserveAspectCrop
+        source:TreasureBlock.getDoodadTileName(parent);
+        z: 100
+
+    }
+
     FontLoader { id: localFont; source: "assets/tscuc.ttf" }
     Text {
         anchors.centerIn: parent
         text: parent.dataHidden?"":(parent.text<1)?"":parent.text
         //font:// This is available in all editors
         color: "red"
-        font { family: localFont.name; pixelSize: 20; capitalization: Font.Capitalize }
+        font { family: localFont.name; pixelSize: 40; capitalization: Font.Capitalize }
     }
 
 }
