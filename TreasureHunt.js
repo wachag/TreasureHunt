@@ -86,12 +86,14 @@ function createBlock(column, row, value) {
     return true
 }
 
-function showBlock(column, row) {
+function showBlock(column, row, stepIfMarked) {
     if (column >= maxColumn || column < 0 || row >= maxRow || row < 0)
         return 0
     if (board[index(column, row)] == null)
         return 0
     if (board[index(column, row)].dataHidden == 0)
+        return 0
+    if (board[index(column, row)].marked == 1 & !stepIfMarked)
         return 0
     board[index(column, row)].dataHidden = 0
     if (board[index(column, row)].text == -1)
@@ -99,7 +101,7 @@ function showBlock(column, row) {
     if (board[index(column, row)].text == "0") {
         for (var a = column - 1; a <= column + 1; a++)
             for (var b = row - 1; b <= row + 1; b++) {
-                showBlock(a, b)
+                showBlock(a, b,stepIfMarked)
             }
     }
 }
@@ -107,7 +109,12 @@ function showBlock(column, row) {
 function handleClick(xPos, yPos, rightPressed) {
     var column = Math.floor((xPos - xOffs) / blockSize)
     var row = Math.floor((yPos - yOffs) / blockSize)
+    if (column >= maxColumn || column < 0 || row >= maxRow || row < 0)
+        return 0
+    if (board[index(column, row)] == null)
+        return 0
     if (rightPressed) {
+        if (board[index(column, row)].dataHidden == 0 &&board[index(column, row)].marked == 0)return
 
         if (board[index(column, row)].marked == 0)
             board[index(column, row)].marked = 1
@@ -115,6 +122,32 @@ function handleClick(xPos, yPos, rightPressed) {
             board[index(column, row)].marked = 0
         return
     }
-    if (showBlock(column, row) == -1)
+    if (showBlock(column, row,1) == -1)
         console.log("DIE!")
+}
+function handleDoubleClick(xPos, yPos) {
+    var column = Math.floor((xPos - xOffs) / blockSize)
+    var row = Math.floor((yPos - yOffs) / blockSize)
+    console.log("Double")
+    if (column >= maxColumn || column < 0 || row >= maxRow || row < 0)
+        return 0
+    if (board[index(column, row)] == null)
+        return 0
+    if (board[index(column, row)].dataHidden == 1)
+        return 0
+    if (board[index(column, row)].marked == 1)
+        return 0
+    var marked = 0
+    for (var a = column - 1; a <= column + 1; a++)
+        for (var b = row - 1; b <= row + 1; b++)
+            if (a >= maxColumn || a < 0 || b >= maxRow || b < 0)
+                continue
+            else if (board[index(a, b)].marked == 1)
+                marked++
+    if (marked == board[index(column, row)].text)
+        for (var a = column - 1; a <= column + 1; a++)
+            for (var b = row - 1; b <= row + 1; b++)
+
+                if (showBlock(a, b, 0) == -1)
+                    console.log("DIE!")
 }

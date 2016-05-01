@@ -35,6 +35,8 @@ Window {
                 anchors.fill: parent
                 onClicked: TreasureHunt.handleClick(
                                mouse.x, mouse.y, mouse.button == Qt.RightButton)
+                onDoubleClicked:TreasureHunt.handleDoubleClick(
+                                    mouse.x, mouse.y)
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
             }
         }
