@@ -33,11 +33,12 @@ Window {
             }
             MouseArea {
                 anchors.fill: parent
-                onClicked: TreasureHunt.handleClick(
+                onClicked: if(!TreasureHunt.isDead())TreasureHunt.handleClick(
                                mouse.x, mouse.y, mouse.button == Qt.RightButton)
-                onDoubleClicked:TreasureHunt.handleDoubleClick(
+                onDoubleClicked:if(!TreasureHunt.isDead())TreasureHunt.handleDoubleClick(
                                     mouse.x, mouse.y)
-                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                acceptedButtons:  Qt.LeftButton | Qt.RightButton
+
             }
         }
 
@@ -58,12 +59,12 @@ Window {
             }
 
             Text {
-                id: score
+                id: trapsFoundShow
                 anchors {
                     right: parent.right
                     verticalCenter: parent.verticalCenter
                 }
-                text: "Score: Who knows?"
+                text: "0"
             }
         }
     }

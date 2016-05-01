@@ -6,12 +6,30 @@ var board = new Array(maxIndex)
 var component
 var xOffs = 0
 var yOffs = 0
+var trapsFound = 0
+var trapsToFind = 10
+var dead = 0
+
+function isDead()
+{
+
+    return dead==1
+}
+
 //Index function used instead of a 2D array
+
 function index(column, row) {
     return column + (row * maxColumn)
 }
+function die(){
+    dead = 1
+    trapsFoundShow.text="KABOOM!";
+}
 
 function startNewGame() {
+    dead = 0
+    trapsFoundShow.text="...";
+
     //Delete blocks from previous game
     for (var i = 0; i < maxIndex; i++) {
         if (board[i] != null)
@@ -33,7 +51,7 @@ function startNewGame() {
             board[index(column, row)] = 0
         }
     }
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < trapsToFind; i++) {
         var passed = false
         while (!passed) {
             var x = Math.floor(Math.random() * maxColumn)
@@ -105,6 +123,30 @@ function showBlock(column, row, stepIfMarked) {
             }
     }
 }
+function markBlock(column, row){
+    if (board[index(column, row)].dataHidden == 0 &&board[index(column, row)].marked == 0)return
+
+    if (board[index(column, row)].marked == 0){
+        board[index(column, row)].marked = 1
+        if (board[index(column,row)].text == -1){
+            trapsFound++
+        }
+        else
+            trapsFound--
+    }
+    else{
+        board[index(column, row)].marked = 0
+        if (board[index(column,row)].text == -1){
+            trapsFound--
+        }
+        else
+            trapsFound++
+    }
+    trapsFoundShow.text=(trapsFound==10)?"WIN":"..." // cheat
+
+    return
+
+}
 
 function handleClick(xPos, yPos, rightPressed) {
     var column = Math.floor((xPos - xOffs) / blockSize)
@@ -114,21 +156,15 @@ function handleClick(xPos, yPos, rightPressed) {
     if (board[index(column, row)] == null)
         return 0
     if (rightPressed) {
-        if (board[index(column, row)].dataHidden == 0 &&board[index(column, row)].marked == 0)return
-
-        if (board[index(column, row)].marked == 0)
-            board[index(column, row)].marked = 1
-        else
-            board[index(column, row)].marked = 0
+        markBlock(column,row)
         return
     }
     if (showBlock(column, row,1) == -1)
-        console.log("DIE!")
+        die()
 }
 function handleDoubleClick(xPos, yPos) {
     var column = Math.floor((xPos - xOffs) / blockSize)
     var row = Math.floor((yPos - yOffs) / blockSize)
-    console.log("Double")
     if (column >= maxColumn || column < 0 || row >= maxRow || row < 0)
         return 0
     if (board[index(column, row)] == null)
@@ -149,5 +185,7 @@ function handleDoubleClick(xPos, yPos) {
             for (var b = row - 1; b <= row + 1; b++)
 
                 if (showBlock(a, b, 0) == -1)
-                    console.log("DIE!")
+                    die()
+
+
 }
