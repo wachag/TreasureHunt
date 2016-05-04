@@ -37,6 +37,8 @@ Window {
                                mouse.x, mouse.y, mouse.button == Qt.RightButton)
                 onDoubleClicked:if(!TreasureHunt.isDead())TreasureHunt.handleDoubleClick(
                                     mouse.x, mouse.y)
+                onPressAndHold: if(!TreasureHunt.isDead())TreasureHunt.handleClick(
+                                                              mouse.x, mouse.y, 1)
                 acceptedButtons:  Qt.LeftButton | Qt.RightButton
 
             }

@@ -1,5 +1,5 @@
 Qt.include("pathfinding/pathfinding.js")
-var blockSize = 64
+var blockSize = 128
 var maxColumn = 10
 var maxRow = 15
 var maxIndex = maxColumn * maxRow
@@ -40,7 +40,7 @@ function startNewGame() {
     dead = 0
     trapsFoundShow.text = "..."
 
-    testPF()
+
     playerX = 0
     playerY = 0
     //Delete blocks from previous game
