@@ -1,3 +1,4 @@
+
 function getBlockTileName(parent) {
     if(parent.dataHidden)
         if(parent.marked)
@@ -12,10 +13,22 @@ function getBlockTileName(parent) {
 
 }
 
+function getPlayerTileName(parent){
+    if(parent.isPlayer){
+        return "assets/char.png"
+    }
+    else
+        return "assets/nothing.png"
+}
+
 function getDoodadTileName(parent) {
     if(parent.marked){
         return "assets/mark.png";
-    }
+    }else
+        if(parent.isRoute){
+            return "assets/cave_19_0.png"
+        }
+
     else
         return "assets/nothing.png";
 }

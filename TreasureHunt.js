@@ -1,3 +1,4 @@
+Qt.include("pathfinding/pathfinding.js")
 var blockSize = 64
 var maxColumn = 10
 var maxRow = 15
@@ -9,27 +10,39 @@ var yOffs = 0
 var trapsFound = 0
 var trapsToFind = 10
 var dead = 0
-
-function isDead()
-{
-
-    return dead==1
+var playerX = 0
+var playerY = 0
+function isDead() {
+    return dead == 1
 }
 
-//Index function used instead of a 2D array
 
+//Index function used instead of a 2D array
 function index(column, row) {
     return column + (row * maxColumn)
 }
-function die(){
+function die() {
     dead = 1
-    trapsFoundShow.text="KABOOM!";
+    trapsFoundShow.text = "KABOOM!"
+}
+
+
+function movePlayer(x, y) {
+    board[index(playerX, playerY)].isPlayer = 0
+    playerX = x
+    playerY = y
+    board[index(playerX, playerY)].isPlayer = 1
+    if (showBlock(playerX, playerY, 1, 5,1) == -1)
+        die()
 }
 
 function startNewGame() {
     dead = 0
-    trapsFoundShow.text="...";
+    trapsFoundShow.text = "..."
 
+    testPF()
+    playerX = 0
+    playerY = 0
     //Delete blocks from previous game
     for (var i = 0; i < maxIndex; i++) {
         if (board[i] != null)
@@ -60,6 +73,10 @@ function startNewGame() {
                 board[index(x, y)] = -1
                 passed = true
             }
+            if (x == playerX && y == playerY){
+                board[index(x, y)] = 0
+                passed = false
+            }
         }
         for (var a = x - 1; a <= x + 1; a++)
             for (var b = y - 1; b <= y + 1; b++) {
@@ -75,6 +92,7 @@ function startNewGame() {
             createBlock(column, row, board[index(column, row)])
         }
     }
+    movePlayer(playerX, playerY)
 }
 
 function createBlock(column, row, value) {
@@ -97,6 +115,8 @@ function createBlock(column, row, value) {
         dynamicObject.height = blockSize
         dynamicObject.text = value
         dynamicObject.dataHidden = 1
+        dynamicObject.marked = 0
+        dynamicObject.isPlayer = 0
         board[index(column, row)] = dynamicObject
     } else {
         return false
@@ -104,48 +124,50 @@ function createBlock(column, row, value) {
     return true
 }
 
-function showBlock(column, row, stepIfMarked) {
+function showBlock(column, row, stepIfMarked, distance, stepped) {
+    if (distance < 0)
+        return
     if (column >= maxColumn || column < 0 || row >= maxRow || row < 0)
         return 0
     if (board[index(column, row)] == null)
         return 0
-    if (board[index(column, row)].dataHidden == 0)
+    if (board[index(column, row)].dataHidden == 0 && !stepped)
         return 0
     if (board[index(column, row)].marked == 1 & !stepIfMarked)
         return 0
+
     board[index(column, row)].dataHidden = 0
     if (board[index(column, row)].text == -1)
         return -1
     if (board[index(column, row)].text == "0") {
         for (var a = column - 1; a <= column + 1; a++)
             for (var b = row - 1; b <= row + 1; b++) {
-                showBlock(a, b,stepIfMarked)
+                showBlock(a, b, stepIfMarked, distance - 1, 0)
             }
     }
 }
-function markBlock(column, row){
-    if (board[index(column, row)].dataHidden == 0 &&board[index(column, row)].marked == 0)return
+function markBlock(column, row) {
+    if (board[index(column,
+                    row)].dataHidden == 0 && board[index(column,
+                                                         row)].marked == 0)
+        return
 
-    if (board[index(column, row)].marked == 0){
+    if (board[index(column, row)].marked == 0) {
         board[index(column, row)].marked = 1
-        if (board[index(column,row)].text == -1){
+        if (board[index(column, row)].text == -1) {
             trapsFound++
-        }
-        else
+        } else
             trapsFound--
-    }
-    else{
+    } else {
         board[index(column, row)].marked = 0
-        if (board[index(column,row)].text == -1){
+        if (board[index(column, row)].text == -1) {
             trapsFound--
-        }
-        else
+        } else
             trapsFound++
     }
-    trapsFoundShow.text=(trapsFound==10)?"WIN":"..." // cheat
+    trapsFoundShow.text = (trapsFound == 10) ? "WIN" : "..." // cheat
 
     return
-
 }
 
 function handleClick(xPos, yPos, rightPressed) {
@@ -156,11 +178,42 @@ function handleClick(xPos, yPos, rightPressed) {
     if (board[index(column, row)] == null)
         return 0
     if (rightPressed) {
-        markBlock(column,row)
+        markBlock(column, row)
         return
     }
-    if (showBlock(column, row,1) == -1)
-        die()
+    /* check whether there is a path from playerX, playerY to here */
+    var dim = Math.max(maxColumn, maxRow)
+    var walkability = new Array(dim)
+    for (var i = 0; i < dim; i++) {
+        walkability[i] = new Array(dim)
+        for (var j = 0; j < dim; j++)
+            walkability[i][j] = 1 // unwalkable
+    }
+    for (var ro = 0; ro < maxRow; ro++)
+        for (var col = 0; col < maxColumn; col++) {
+            walkability[ro][col] = board[index(
+                                             col,
+                                             ro)].dataHidden // not hidden: walkable
+            board[index(col,ro)].isRoute=0
+        }
+    walkability[row][column] = 0 // dest is walkable
+    walkability[playerY][playerX] = 0 // current place is walkable
+/*    for (var ro = playerY - 1; ro <= playerY + 1; ro++)
+        for (var col = playerX - 1; col <= playerX + 1; col++) {
+            if (ro >= 0 && ro <= maxRow && col >= 0 && col <= maxColumn)
+                walkability[ro][col] = 0 // neigh
+        }*/
+    var path = findPath(walkability, [playerY, playerX], [row, column])
+    for(var i=0;i<path.length;i++)
+        board[index(path[i][1],path[i][0])].isRoute=1
+    console.log("Here")
+    if (path.length > 0) {
+        console.log(JSON.stringify(path))
+
+        movePlayer(column, row)
+    }
+
+    //movePlayer(column,row)
 }
 function handleDoubleClick(xPos, yPos) {
     var column = Math.floor((xPos - xOffs) / blockSize)
@@ -183,9 +236,6 @@ function handleDoubleClick(xPos, yPos) {
     if (marked == board[index(column, row)].text)
         for (var a = column - 1; a <= column + 1; a++)
             for (var b = row - 1; b <= row + 1; b++)
-
-                if (showBlock(a, b, 0) == -1)
+                if (showBlock(a, b, 0, 0, 0) == -1)
                     die()
-
-
 }

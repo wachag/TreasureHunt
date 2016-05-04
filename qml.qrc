@@ -346,5 +346,7 @@
         <file>TreasureBlock.js</file>
         <file>assets/mark.png</file>
         <file>assets/nothing.png</file>
+        <file>pathfinding/pathfinding.js</file>
+        <file>assets/char.png</file>
     </qresource>
 </RCC>

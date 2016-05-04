@@ -8,6 +8,8 @@ Rectangle {
     property string text: "?"
     property int dataHidden: 1
     property int marked: 0
+    property int isPlayer: 0
+    property int isRoute:0
     Image {
         id: tile
         anchors.fill: parent
@@ -20,9 +22,18 @@ Rectangle {
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
         source:TreasureBlock.getDoodadTileName(parent);
+        z: 10
+
+    }
+    Image{
+        id: player
+        anchors.fill: parent
+        fillMode: Image.PreserveAspectCrop
+        source:TreasureBlock.getPlayerTileName(parent);
         z: 100
 
     }
+
 
     FontLoader { id: localFont; source: "assets/tscuc.ttf" }
     Text {
